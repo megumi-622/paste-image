@@ -8,27 +8,26 @@ def check_setting_file(file_name):
 
     Parameter:
     ----------
-        file_name: string
-            設定用jsonファイル名 *.json
+    file_name: string
+        設定用jsonファイル名 *.json
     Returns:
     ----------
-        list
-            flag: Boolean
-                設定ファイル読み混み可否
-            msg: string
-                jsonファイルの内容かエラーメッセージ
+    list
+        flag: Boolean
+            設定ファイルの有無
+        msg: string
+            jsonファイルの内容かエラーメッセージ
     """
 
     # エラー判定用
     flag = False
 
     try:
-        json_open = open(file_name, "r")
+        json = open(file_name, "r")
     except FileNotFoundError as e:
         return flag, "setting.jsonがありません"
     else:
-        # msg = json.load(json_open)
-        msg = json_open
+        msg = json
         flag = True
 
         return flag, msg
@@ -37,6 +36,7 @@ def check_setting_file(file_name):
 def img_check(file_path):
     """
     画像があるかどうか確認
+
     Parameters
     ----------
     file_path: string
@@ -66,7 +66,7 @@ class image_obi:
 
         Returns
         ----------
-        new_path: fspath
+        new_path: string
             新しいファイルパス
         """
         #ファイル名と拡張子をわける
@@ -74,7 +74,7 @@ class image_obi:
 
         # ファイル名と0埋め数値と拡張子を結合
         new_file_name = "{}-{:03}{}".format(ftitle, cnt, fext)
-        # 新しいファイル名をパス化する
+        # 新しいファイル名でwindowsのpath表記にする
         new_path = os.fspath(new_file_name)
 
         if os.path.exists(new_path):
@@ -88,24 +88,24 @@ class image_obi:
             rename()
 
 
-    def synthesis(self, main_img, obi_img):
+    def synthesis(self, main_img_path, obi_img_path):
         """
         画像を合成する
 
         Parameters
         ----------
-        file_path: string
+        main_img_path: string
             画像ファイル名
-        img_path: string
+        obi_img_path: string
             上部に貼り付ける画像
         """
 
-        obi_flag = img_check(obi_img)
+        obi_flag = img_check(obi_img_path)
 
         if not obi_flag:
             return (False, "帯用画像がありません")
 
-        main_flag = img_check(main_img)
+        main_flag = img_check(main_img_path)
 
         if not main_flag:
             return (False, "メイン用画像がありません")
@@ -151,17 +151,16 @@ class image_obi:
             synthesis()
         
  
-setting = "setting.json"
-
 if __name__ == "__main__":
     
-    setting = "setting.json"
-
-    flag, msg = check_setting_file(setting)
+    # 設定ファイルの有無を確認
+    flag, msg = check_setting_file("setting.json")
 
     if not flag:
+        # 設定ファイルエラー
         print(msg)
     else:
+        # 上部に合成する画像ファイルのpath
         obi_path = json.load(msg)["imgPath"]
         try:
             while True:
