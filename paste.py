@@ -24,8 +24,8 @@ def check_setting_file(file_name):
 
     try:
         json = open(file_name, "r")
-    except FileNotFoundError as e:
-        return flag, "setting.jsonがありません"
+    except FileNotFoundError:
+        return flag, f"{file_name}がありません"
     else:
         msg = json
         flag = True
@@ -103,35 +103,43 @@ class image_obi:
         obi_flag = img_check(obi_img_path)
 
         if not obi_flag:
-            return (False, "帯用画像がありません")
+            return False, "帯用画像がありません"
 
         main_flag = img_check(main_img_path)
 
         if not main_flag:
-            return (False, "メイン用画像がありません")
+            return False, "メイン用画像がありません"
 
         # 上部に合成する画像を開く
-        obi = Image.open(obi_img)
+        obi = Image.open(obi_img_path)
 
         # メイン画像を開く
-        img = Image.open(main_img)
+        img = Image.open(main_img_path)
     
         # 上部に貼り付ける画像サイズ
         obi_width, obi_height = obi.size
 
         # メイン画像のサイズ
-        img_width, img_height = img.size
+        img_width, _ = img.size
 
         if obi_width <= 0 or img_width <= 0:
-            return (False, "画像サイズが小さすぎます")
+            return False, "画像サイズがありません"
 
         if obi_height <= 0:
-            return (False, "画像サイズが小さすぎます")
+            return False, "画像サイズがありません"
 
-        # 上部に貼り付ける画像をメイン画像の割合を出す
-        percentage = float(img_width) / float(obi_width)
-        # 割合をもとに上部に貼り付ける画像の高さを出す
-        obi_height2 = round((obi_height * float(percentage)), 0)
+        try:
+            # 上部に貼り付ける画像をメイン画像の割合を出す
+            percentage = float(img_width) / float(obi_width)
+        except ZeroDivisionError:
+            return False, "画像がありません"
+
+        try:
+            # 割合をもとに上部に貼り付ける画像の高さを出す
+            obi_height2 = round((obi_height * float(percentage)), 0)
+        except ZeroDivisionError:
+            return False, "画像がありません"
+
         # 上部に貼り付ける画像をリサイズする
         resized = obi.resize((img_width, int(obi_height2)))
     
@@ -142,10 +150,10 @@ class image_obi:
 
         image = image_obi()
         # リネームして保存する
-        new_name = image.rename(main_img)
+        new_name = image.rename(main_img_path)
         img_copy.save(new_name, quality=100)
 
-        return True, "画像を保存しました ファイル名は {}".format(new_name)
+        return True, f"画像を保存しました ファイル名は {new_name}"
 
         if __name__ == "__main__":
             synthesis()
@@ -164,17 +172,17 @@ if __name__ == "__main__":
         obi_path = json.load(msg)["imgPath"]
         try:
             while True:
-                print("画像パスを入力 Ctrl+cで終了します")
+                print("画像名を拡張子まで入力 Ctrl+cで終了します")
                 path = input(">> ")
                 image = image_obi()
                 img_flag, img_msg = image.synthesis(path, obi_path)
                 if img_flag:
                     print("\n", img_msg)
-                    print("\n 画像パスを入力 Ctrl+cで終了します")
+                    print("\n 画像名を拡張子まで入力 Ctrl+cで終了します")
                     path = input(">> ")
                 else:
                     print("\n", img_msg)
-                    print("\n 画像パスを入力 Ctrl+cで終了します")
+                    print("\n 画像名を拡張子まで入力 Ctrl+cで終了します")
                     path = input(">> ")
         except KeyboardInterrupt:
             pass
