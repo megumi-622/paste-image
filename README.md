@@ -20,7 +20,7 @@ setting.jsonのデフォルト値
 }
 ```
 
-メイン画像は`paste.py`と同じディレクトリに保存すると使いやすい
+メイン画像は**paste.py**と同じディレクトリに保存すると使いやすい
 
 pythonファイルをexe化するためのライブラリをインストール
 
@@ -40,7 +40,7 @@ Building EXE from EXE-00.toc completed successfully.
 ```
 と、最後に表示されればexe化完了
 
-必要なファイルは`dist`ディレクトリ内の**paste.exe**だけなので他は削除していい
+必要なファイルはdistディレクトリ内の**paste.exe**だけなので他は削除していい
 
 ## 実行
 **paste.exe**をダブルクリックして起動する  
